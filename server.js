@@ -47,11 +47,25 @@ app.get('/api/notes', (req, res, next) => {
 //     res.json(data);
 //   }
 // });
-
-app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id;
-  res.json(data.find(item => item.id === Number(id)));
+app.get('/api/notes/:id', (req, res, next) => {
+  const reqId = req.params.id;
+  //console.log(req.params.id);
+  notes.find(reqId, (err, item) =>{
+    if (err){
+      return next(err);
+    }
+    if (item){
+      res.json(item);
+    } else{
+      next();
+    }
+  });
 });
+
+// app.get('/api/notes/:id', (req, res) => {
+//   const id = req.params.id;
+//   res.json(data.find(item => item.id === Number(id)));
+// });
 // error example
 app.get('/boom', (req, res, next) => {
   throw new Error('Boom!!');
