@@ -71,7 +71,7 @@ app.get('/api/notes/:id', (req, res, next) => {
 // update
 app.put('/api/notes/:id', (req, res, next) => {
   const id = req.params.id;
-  console.log(req.body);
+  //console.log(req.body);
   /***** Never trust users - validate input *****/
   const updateObj = {};
   const updateFields = ['title', 'content'];
@@ -82,7 +82,7 @@ app.put('/api/notes/:id', (req, res, next) => {
     }
   });
   
-  console.log(updateObj);
+  // console.log(updateObj);
   notes.update(id, updateObj, (err, item) => {
     if (err) {
       return next(err);
