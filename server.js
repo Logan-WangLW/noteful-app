@@ -1,8 +1,11 @@
 'use strict';
 
 const express = require('express');
-// Load array of notes
+// add simple in-memory database
 const data = require('./db/notes');
+const simDB = require('./db/simDB'); 
+const notes = simDB.initialize(data);
+
 // Different exported modules
 const {PORT} = require('./config');
 const logger = require('./middleware/logger');
