@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const morgan = require('morgan');
 // add simple in-memory database
 const data = require('./db/notes');
 const simDB = require('./db/simDB'); 
@@ -8,11 +9,13 @@ const notes = simDB.initialize(data);
 
 // Different exported modules
 const {PORT} = require('./config');
-const logger = require('./middleware/logger');
+//const logger = require('./middleware/logger');
+
 // INSERT EXPRESS APP CODE HERE...
 const app = express();
-// log requests
-app.use(logger);
+// log requests using morgan
+app.use(morgan('dev'));
+// app.use(logger);
 // create static web server
 app.use(express.static('public'));
 // Parse request body
