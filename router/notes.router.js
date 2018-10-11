@@ -6,22 +6,29 @@ const router = express.Router();
 
 //simple database
 const data = require('../db/notes');
-const simDB = require('../db/simDB'); 
+const simDB = require('../db/simDB');
 const notes = simDB.initialize(data);
 
 router.get('/notes', (req, res, next) => {
-  const { searchTerm } = req.query;
+  const {
+    searchTerm
+  } = req.query;
 
-  notes.filter(searchTerm, (err, list) => {
-    if (err) {
-      return next(err); // goes to error handler
-    }
-    res.json(list); // responds with filtered array
-  });
+  notes.filter(searchTerm)
+    .then(list => {
+      res.json(list);
+    })
+    .catch(err => next(err));
+  // notes.filter(searchTerm, (err, list) => {
+  //   if (err) {
+  //     return next(err); // goes to error handler
+  //   }
+  //   res.json(list); // responds with filtered array
+  // });
 });
 
 // app.get('/api/notes', (req, res) => {
-  
+
 //   const searchTerm = req.query.searchTerm;
 //   let lowerCaseST = '';
 
@@ -42,17 +49,32 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const reqId = req.params.id;
   //console.log(req.params.id);
-  notes.find(reqId, (err, item) =>{
-    if (err){
-      return next(err);
-    }
-    if (item){
-      res.json(item);
-    } else{
-      next();
-    }
-  });
+  //Promise style
+  notes.find(reqId)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
 });
+
+
+// notes.find(reqId, (err, item) =>{
+//   if (err){
+//     return next(err);
+//   }
+//   if (item){
+//     res.json(item);
+//   } else{
+//     next();
+//   }
+// });
+
 
 // app.get('/api/notes/:id', (req, res) => {
 //   const id = req.params.id;
@@ -72,54 +94,87 @@ router.put('/notes/:id', (req, res, next) => {
       updateObj[field] = req.body[field];
     }
   });
-  
-  // console.log(updateObj);
-  notes.update(id, updateObj, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
+  //promise
+  notes.update(id, updateObj)
+    .then(item => {
+      if(item){
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err =>{
+      next(err);
+    });
 });
+
+
+// notes.update(id, updateObj, (err, item) => {
+//   if (err) {
+//     return next(err);
+//   }
+//   if (item) {
+//     res.json(item);
+//   } else {
+//     next();
+//   }
+// });
+
 
 // Post (insert) an item
 router.post('/notes', (req, res, next) => {
-  const { title, content } = req.body;
+  const {
+    title,
+    content
+  } = req.body;
 
-  const newItem = { title, content };
+  const newItem = {
+    title,
+    content
+  };
   /***** Never trust users - validate input *****/
   if (!newItem.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
-
-  notes.create(newItem, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-    } else {
-      next();
-    }
-  });
+  
+  notes.create(newItem)
+    .then(item =>{
+      if(item){
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+      }
+    })
+    .catch(err => next(err));
+  // notes.create(newItem, (err, item) => {
+  //   if (err) {
+  //     return next(err);
+  //   }
+  //   if (item) {
+  //     res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+  //   } else {
+  //     next();
+  //   }
+  // });
 });
 
 // Delete an item
 router.delete('/notes/:id', (req, res, next) => {
-  const reqId = req.params.id; 
-
-  notes.delete(reqId, (err) =>{
-    if (err){
-      return next(err);
-    }
-    res.sendStatus(204);
-  });
+  const reqId = req.params.id;
+  //promise
+  notes.delete(reqId)
+    .then(
+      res.sendStatus(204)
+    )
+    .catch(
+      err => next(err)
+    );
+  // notes.delete(reqId, (err) => {
+  //   if (err) {
+  //     return next(err);
+  //   }
+  //   res.sendStatus(204);
+  // });
 });
 
 module.exports = router;
