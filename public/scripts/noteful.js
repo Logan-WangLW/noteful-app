@@ -150,6 +150,7 @@ const noteful = (function () {
       event.preventDefault();
 
       const noteId = getNoteIdFromElement(event.currentTarget);
+      //promise
       api.remove(noteId)
         .then(() => api.search(store.currentSearchTerm))
         .then(searchResponse => {
